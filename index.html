@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Active - Presentación</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        :root {
+            --brand-green: #d4ff00;
+            --bg-color: #08080a;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: #fff;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; text-shadow: 0 0 15px rgba(212, 255, 0, 0.6); }
+            100% { opacity: 0.7; }
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 6px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--brand-green);
+            box-shadow: 0 0 15px var(--brand-green);
+            transition: width 0.3s ease;
+        }
+
+        .progress-percentage {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        /* Swiper */
+        .swiper {
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+        
+        .swiper.initialized {
+            opacity: 1;
+        }
+
+        .swiper-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        /* Aspect ratio container */
+        .aspect-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-width: 177.7778vh;
+            max-height: 100vh;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Video Containers */
+        .video-container {
+            position: absolute;
+            left: 38.5626%;
+            top: 10.2887%;
+            width: 18.5136%;
+            height: 62.6246%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+            border-radius: 3%; /* Subtle rounding for phone screen */
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none; /* Let container handle clicks */
+        }
+
+        /* ==========================================
+           AJUSTES DEL VIDEO DE LA LÁMINA 15
+           ========================================== 
+           ¡Aquí puedes ajustar tú mismo el video a la perfección! 
+           Solo cambia los números de abajo y presiona F5. */
+        #video-container-15 {
+            /* 1. MOVER IZQUIERDA / DERECHA 
+               (Aumenta el número para mover a la derecha, redúcelo para la izquierda) */
+            left: 36.9%; 
+
+            /* 2. MOVER ARRIBA / ABAJO 
+               (Aumenta el número para bajar el video, redúcelo para subirlo) */
+            top: 9.2%; 
+
+            /* 3. TAMAÑO DEL VIDEO 
+               (Aumenta el número para agrandarlo, redúcelo para encogerlo. 
+                No te preocupes por el alto, se ajusta automáticamente gracias al aspect-ratio) */
+            width: 19.3012%; 
+
+            /* -- No necesitas tocar esto -- */
+            height: auto;
+            aspect-ratio: 6.27 / 11.93;
+        }
+        /* ========================================== */
+
+        /* Play Button */
+        .play-btn {
+            position: absolute;
+            width: 25%;
+            aspect-ratio: 1;
+            background: rgba(212, 255, 0, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 20;
+            box-shadow: 0 0 25px rgba(212, 255, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .video-container .play-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .video-container.playing .play-btn {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .video-container.playing:hover .play-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .play-icon, .pause-icon {
+            width: 40%;
+            height: 40%;
+            fill: #08080a;
+        }
+        
+        .play-icon {
+            margin-left: 10%;
+        }
+
+        .pause-icon {
+            display: none;
+        }
+
+        .video-container.playing .play-icon {
+            display: none;
+        }
+        
+        .video-container.playing .pause-icon {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loading-text">Cargando Experiencia</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-percentage" id="progress-text">0%</div>
+    </div>
+
+    <!-- Swiper Container -->
+    <div class="swiper" id="main-swiper">
+        <div class="swiper-wrapper" id="swiper-wrapper">
+            <!-- Slides will be injected by JS -->
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const totalSlides = 17;
+        const imageUrls = [];
+        for (let i = 1; i <= totalSlides; i++) {
+            const num = i < 10 ? '0' + i : i;
+            imageUrls.push(`img/${num}.png`);
+        }
+
+        let loadedCount = 0;
+        const wrapper = document.getElementById('swiper-wrapper');
+
+        // Function to create HTML for a slide
+        function createSlideHTML(index) {
+            const num = index < 10 ? '0' + index : index;
+            let html = `<div class="swiper-slide">
+                            <div class="aspect-container">
+                                <img src="img/${num}.png" class="slide-bg" alt="Slide ${num}" />`;
+            
+            // Add video for slide 15 and 16
+            if (index === 15 || index === 16) {
+                html += `
+                                <div id="video-container-${index}" class="video-container" onclick="togglePlay(${index})">
+                                    <video id="video-${index}" src="videos/${index}.mp4" playsinline preload="auto"></video>
+                                    <div class="play-btn">
+                                        <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        <svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                    </div>
+                                </div>`;
+            }
+
+            html += `       </div>
+                        </div>`;
+            return html;
+        }
+
+        // Generate DOM elements
+        for (let i = 1; i <= totalSlides; i++) {
+            wrapper.innerHTML += createSlideHTML(i);
+        }
+
+        // Preload Images
+        imageUrls.forEach(url => {
+            const img = new Image();
+            img.src = url;
+            img.onload = imageLoaded;
+            img.onerror = imageLoaded; // Proceed even if an image fails
+        });
+
+        function imageLoaded() {
+            loadedCount++;
+            const progress = (loadedCount / totalSlides) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-text').innerText = Math.round(progress) + '%';
+
+            if (loadedCount === totalSlides) {
+                setTimeout(() => {
+                    document.getElementById('preloader').classList.add('hidden');
+                    initSwiper();
+                }, 800);
+            }
+        }
+
+        function initSwiper() {
+            document.getElementById('main-swiper').classList.add('initialized');
+            const swiper = new Swiper('.swiper', {
+                speed: 800,
+                direction: 'horizontal',
+                mousewheel: {
+                    forceToAxis: true,
+                },
+                keyboard: {
+                    enabled: true,
+                },
+                grabCursor: true,
+                effect: 'creative',
+                creativeEffect: {
+                    prev: {
+                        shadow: true,
+                        translate: ['-20%', 0, -1],
+                        opacity: 0,
+                    },
+                    next: {
+                        translate: ['100%', 0, 0],
+                    },
+                },
+                on: {
+                    slideChange: function () {
+                        // Pause any playing videos when changing slides
+                        document.querySelectorAll('.video-container video').forEach(vid => {
+                            vid.pause();
+                            vid.parentElement.classList.remove('playing');
+                        });
+                    },
+                    click: function (swiper, event) {
+                        // Advance to next slide on click, unless we clicked a video container
+                        if (!event.target.closest('.video-container')) {
+                            swiper.slideNext();
+                        }
+                    }
+                }
+            });
+        }
+
+        function togglePlay(id) {
+            const video = document.getElementById('video-' + id);
+            const container = video.parentElement;
+            
+            if (video.paused) {
+                video.play();
+                container.classList.add('playing');
+            } else {
+                video.pause();
+                container.classList.remove('playing');
+            }
+        }
+    </script>
+</body>
+</html>
